@@ -1,13 +1,13 @@
 <template>
-  <GenericListPage :table-config="tableConfig" :header-actions="headerActions" />
+  <ListTable :table-config="tableConfig" :header-actions="headerActions" />
 </template>
 
 <script>
-import GenericListPage from '@/layout/components/GenericListPage'
+import ListTable from '@/components/ListTable'
 
 export default {
   components: {
-    GenericListPage
+    ListTable
   },
   data() {
     return {
@@ -19,6 +19,11 @@ export default {
         columnsMeta: {
           name: {
             formatter: null
+          },
+          actions: {
+            formatterArgs: {
+              updateRoute: 'GatherUserTaskUpdate'
+            }
           }
         }
       },

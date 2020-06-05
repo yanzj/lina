@@ -38,7 +38,10 @@ export default {
           enable: true,
           url: (process.env.VUE_APP_ENV === 'production') ? (`${this.setting.treeUrl}`) : (`${process.env.VUE_APP_BASE_API}${this.setting.treeUrl}`),
           autoParam: ['id=key', 'name=n', 'level=lv'],
-          type: 'get'
+          type: 'get',
+          headers: {
+            'X-JMS-ORG': JSON.parse(this.$cookie.get('jms_current_org')).id || ''
+          }
         },
         callback: {
           onRightClick: this.onRightClick.bind(this),
@@ -69,6 +72,9 @@ export default {
       return this.$refs.dataztree.rMenu
     }
   },
+  mounted() {
+
+  },
   methods: {
     editTreeNode: function() {
       this.hideRMenu()
@@ -96,7 +102,6 @@ export default {
       }
     },
     removeTreeNode: function() {
-      const vm = this
       this.hideRMenu()
       const currentNode = this.zTree.getSelectedNodes()[0]
       if (!currentNode) {
@@ -105,14 +110,13 @@ export default {
       this.$axios.delete(
         `${this.treeSetting.nodeUrl}${currentNode.meta.node.id}/`
       ).then(() => {
-        vm.$refs.dataztree.refresh()
         this.$message.success(this.$t('common.deleteSuccessMsg'))
+        this.zTree.removeNode(currentNode)
       }).catch(error => {
         this.$message.error(this.$t('common.deleteErrorMsg' + ' ' + error))
       })
     },
     onRename: function(event, treeId, treeNode, isCancel) {
-      const vm = this
       const url = `${this.treeSetting.nodeUrl}${this.currentNodeId}/`
       if (isCancel) {
         return
@@ -127,7 +131,7 @@ export default {
         }
         treeNode.name = treeNode.name + ' (' + assets_amount + ')'
         this.zTree.updateNode(treeNode)
-        vm.$refs.dataztree.refresh()
+        // vm.$refs.dataztree.refresh()
         this.$message.success(this.$t('common.updateSuccessMsg'))
       }).catch(error => {
         this.$message.error(this.$t('common.updateErrorMsg' + ' ' + error))
@@ -192,7 +196,6 @@ export default {
     },
     addTreeNode: function() {
       this.hideRMenu()
-      const vm = this
       const parentNode = this.zTree.getSelectedNodes()[0]
       if (!parentNode) {
         return
@@ -212,9 +215,10 @@ export default {
         }
         newNode.checked = this.zTree.getSelectedNodes()[0].checked
         this.zTree.addNodes(parentNode, 0, newNode)
-        vm.$refs.dataztree.refresh()
-        // const node = this.zTree.getNodeByParam('id', newNode.id, parentNode)
-        // this.zTree.editName(node)
+        // vm.$refs.dataztree.refresh()
+        const node = this.zTree.getNodeByParam('id', newNode.id, parentNode)
+        this.currentNodeId = node.meta.node.id || newNode.id
+        this.zTree.editName(node)
         this.$message.success(this.$t('common.updateSuccessMsg'))
       }).catch(error => {
         this.$message.error(this.$t('common.updateErrorMsg' + ' ' + error))

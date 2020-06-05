@@ -18,7 +18,7 @@
 // 导入JQuery
 // eslint-disable-next-line no-unused-vars
 import $ from '@/utils/jquery-vendor.js'
-import 'ztree'
+import '@ztree/ztree_v3/js/jquery.ztree.all.min.js'
 import '@/styles/ztree.css'
 
 const defaultObject = {
@@ -58,6 +58,7 @@ export default {
             name: this.$t('common.tree.Empty')
           })
         }
+        console.log(this.treeSetting)
         this.zTree = $.fn.zTree.init($('#ztree'), this.treeSetting, res)
         if (this.treeSetting.showRefresh) {
           this.rootNodeAddDom(
@@ -127,7 +128,7 @@ export default {
     border: none;
   }
   div#rMenu li{
-    margin: 2px 0;
+    margin: 6px 0;
     cursor: pointer;
     list-style: none outside none;
   }
